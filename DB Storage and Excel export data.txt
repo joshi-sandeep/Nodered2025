@@ -1,0 +1,274 @@
+[
+    {
+        "id": "3465fa0aabaf5e3f",
+        "type": "comment",
+        "z": "f33195d6bf0880b0",
+        "name": "Node-RED Flow for Sales Data and MongoDB StorageNode-RED Flow for Sales Data and MongoDB Storage",
+        "info": "",
+        "x": 510,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "8ee79f9483eb339d",
+        "type": "group",
+        "z": "f33195d6bf0880b0",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "3a3166134c1459e6",
+            "768cbdac2294ee7b",
+            "ddb9f6e800740e24",
+            "a397b4d4f114d0f0",
+            "95aea820925c4a71",
+            "248846a411918829",
+            "6bd15fab21ca288b",
+            "cfcb6b87e166fa78",
+            "7bb073569538f9cc"
+        ],
+        "x": 94,
+        "y": 159,
+        "w": 792,
+        "h": 282
+    },
+    {
+        "id": "3a3166134c1459e6",
+        "type": "ui_button",
+        "z": "f33195d6bf0880b0",
+        "g": "8ee79f9483eb339d",
+        "name": "",
+        "group": "e9747e83d4ba6ed5",
+        "order": 3,
+        "width": 5,
+        "height": 1,
+        "passthru": false,
+        "label": "Show Data",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "topicType": "str",
+        "x": 270,
+        "y": 240,
+        "wires": [
+            [
+                "ddb9f6e800740e24",
+                "a397b4d4f114d0f0",
+                "95aea820925c4a71"
+            ]
+        ]
+    },
+    {
+        "id": "768cbdac2294ee7b",
+        "type": "ui_button",
+        "z": "f33195d6bf0880b0",
+        "g": "8ee79f9483eb339d",
+        "name": "",
+        "group": "e9747e83d4ba6ed5",
+        "order": 4,
+        "width": 5,
+        "height": 1,
+        "passthru": false,
+        "label": "Generate Excel Report",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "generate_excel",
+        "payloadType": "str",
+        "topic": "",
+        "topicType": "str",
+        "x": 220,
+        "y": 340,
+        "wires": [
+            [
+                "6bd15fab21ca288b"
+            ]
+        ]
+    },
+    {
+        "id": "ddb9f6e800740e24",
+        "type": "function",
+        "z": "f33195d6bf0880b0",
+        "g": "8ee79f9483eb339d",
+        "name": "Phone Sales",
+        "func": "msg.payload = Math.random() * 100;\nmsg.topic = \"Phones\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 200,
+        "wires": [
+            [
+                "248846a411918829"
+            ]
+        ]
+    },
+    {
+        "id": "a397b4d4f114d0f0",
+        "type": "function",
+        "z": "f33195d6bf0880b0",
+        "g": "8ee79f9483eb339d",
+        "name": "Laptop Sales",
+        "func": "msg.payload = Math.random() * 100;\nmsg.topic = \"Laptops\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 240,
+        "wires": [
+            [
+                "248846a411918829"
+            ]
+        ]
+    },
+    {
+        "id": "95aea820925c4a71",
+        "type": "function",
+        "z": "f33195d6bf0880b0",
+        "g": "8ee79f9483eb339d",
+        "name": "Tablet Sales",
+        "func": "msg.payload = Math.random() * 100;\nmsg.topic = \"Tablets\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 280,
+        "wires": [
+            [
+                "248846a411918829"
+            ]
+        ]
+    },
+    {
+        "id": "248846a411918829",
+        "type": "ui_chart",
+        "z": "f33195d6bf0880b0",
+        "g": "8ee79f9483eb339d",
+        "name": "",
+        "group": "e9747e83d4ba6ed5",
+        "order": 1,
+        "width": "6",
+        "height": "5",
+        "label": "Sales",
+        "chartType": "pie",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": "75",
+        "useOneColor": false,
+        "useUTC": false,
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 690,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6bd15fab21ca288b",
+        "type": "function",
+        "z": "f33195d6bf0880b0",
+        "g": "8ee79f9483eb339d",
+        "name": "Prepare Excel & Save to DB",
+        "func": "msg.payload = [\n    { Product: 'Phones', Sales: Math.random() * 100, timestamp: new Date() },\n    { Product: 'Laptops', Sales: Math.random() * 100, timestamp: new Date() },\n    { Product: 'Tablets', Sales: Math.random() * 100, timestamp: new Date() }\n];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 340,
+        "wires": [
+            [
+                "cfcb6b87e166fa78",
+                "7bb073569538f9cc"
+            ]
+        ]
+    },
+    {
+        "id": "cfcb6b87e166fa78",
+        "type": "excel",
+        "z": "f33195d6bf0880b0",
+        "g": "8ee79f9483eb339d",
+        "name": "Generate Excel",
+        "file": "D:/Nodered Git/Nodered2025/output.xlsx",
+        "x": 780,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7bb073569538f9cc",
+        "type": "mongodb out",
+        "z": "f33195d6bf0880b0",
+        "g": "8ee79f9483eb339d",
+        "mongodb": "22c7ef805a91aa60",
+        "name": "Save to MongoDB",
+        "collection": "sales_data",
+        "payonly": false,
+        "upsert": false,
+        "multi": false,
+        "operation": "insert",
+        "x": 770,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "e9747e83d4ba6ed5",
+        "type": "ui_group",
+        "name": "Group 2",
+        "tab": "09bc57a8c5c376ed",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "22c7ef805a91aa60",
+        "type": "mongodb",
+        "hostname": "127.0.0.1",
+        "topology": "direct",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "test",
+        "name": ""
+    },
+    {
+        "id": "09bc57a8c5c376ed",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
