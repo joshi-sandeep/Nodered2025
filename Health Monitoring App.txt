@@ -1,0 +1,449 @@
+[
+    {
+        "id": "8b9720bec7061d45",
+        "type": "comment",
+        "z": "1453a8421bbc3bd8",
+        "name": "Fitness Tracker App",
+        "info": "",
+        "x": 550,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "c5da05433b1d5355",
+        "type": "group",
+        "z": "1453a8421bbc3bd8",
+        "name": "",
+        "style": {
+            "stroke": "#e3f3d3",
+            "fill": "#ffffbf",
+            "label": true
+        },
+        "nodes": [
+            "3d7860eefbeddabc",
+            "0c830a499e655784",
+            "910785e8572b98b4",
+            "966a79d5994892a2",
+            "3474080703452bdb",
+            "c933d0c07554ab3a",
+            "a70a859bc0e61af4",
+            "2fa32eec34a13d55",
+            "e33aa2058112a7e7",
+            "ec5ebc7a66165ae5",
+            "50737421757e7db4",
+            "fec0687fb444df38",
+            "71283ebd93a7181d"
+        ],
+        "x": 34,
+        "y": 99,
+        "w": 952,
+        "h": 442
+    },
+    {
+        "id": "3d7860eefbeddabc",
+        "type": "inject",
+        "z": "1453a8421bbc3bd8",
+        "g": "c5da05433b1d5355",
+        "name": "Every 5 minutes",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1800",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 220,
+        "wires": [
+            [
+                "0c830a499e655784"
+            ]
+        ]
+    },
+    {
+        "id": "0c830a499e655784",
+        "type": "function",
+        "z": "1453a8421bbc3bd8",
+        "g": "c5da05433b1d5355",
+        "name": "Generate Dummy Data",
+        "func": "// Generate random fitness data\nconst steps = Math.floor(Math.random() * 1000) + 5000;\nconst calories = Math.floor(Math.random() * 300) + 1800;\nconst activeMinutes = Math.floor(Math.random() * 60) + 30;\nconst heartRate = Math.floor(Math.random() * 40) + 60;\nconst distance = (Math.random() * 5 + 3).toFixed(2);\n\nconst data = {\n    timestamp: new Date().toISOString(),\n    steps: steps,\n    calories: calories,\n    activeMinutes: activeMinutes,\n    heartRate: heartRate,\n    distance: distance\n};\n\n// Create alert if heart rate exceeds 90\nif(heartRate > 80) {\n    const alertMsg = {\n        payload: `High Heart Rate Alert: ${heartRate} bpm at ${new Date().toLocaleTimeString()}`,\n        topic: \"alert\"\n    };\n    node.send([null, alertMsg]);\n}\n\nmsg.payload = data;\nreturn [msg, null];",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 170,
+        "y": 320,
+        "wires": [
+            [
+                "966a79d5994892a2",
+                "910785e8572b98b4",
+                "71283ebd93a7181d"
+            ],
+            [
+                "fec0687fb444df38"
+            ]
+        ]
+    },
+    {
+        "id": "910785e8572b98b4",
+        "type": "file",
+        "z": "1453a8421bbc3bd8",
+        "g": "c5da05433b1d5355",
+        "name": "Save to data.json",
+        "filename": "D:/Nodered Git/Nodered2025/data.json",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "utf8",
+        "x": 490,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "966a79d5994892a2",
+        "type": "function",
+        "z": "1453a8421bbc3bd8",
+        "g": "c5da05433b1d5355",
+        "name": "Prepare for Dashboard",
+        "func": "const data = msg.payload;\nreturn [\n    {payload: data.steps, topic: \"steps\"},\n    {payload: data.calories, topic: \"calories\"},\n    {payload: data.activeMinutes, topic: \"activeMinutes\"},\n    {payload: data.heartRate, topic: \"heartRate\"},\n    {payload: data.distance, topic: \"distance\"}\n];",
+        "outputs": 5,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 300,
+        "wires": [
+            [
+                "3474080703452bdb"
+            ],
+            [
+                "c933d0c07554ab3a"
+            ],
+            [
+                "a70a859bc0e61af4"
+            ],
+            [
+                "2fa32eec34a13d55",
+                "50737421757e7db4"
+            ],
+            [
+                "e33aa2058112a7e7",
+                "ec5ebc7a66165ae5"
+            ]
+        ]
+    },
+    {
+        "id": "3474080703452bdb",
+        "type": "ui_gauge",
+        "z": "1453a8421bbc3bd8",
+        "g": "c5da05433b1d5355",
+        "name": "",
+        "group": "3214e0cfc3a3f0ea",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Steps",
+        "label": "steps",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "10000",
+        "colors": [
+            "#00ca00",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "3000",
+        "seg2": "6000",
+        "diff": false,
+        "className": "",
+        "x": 860,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "c933d0c07554ab3a",
+        "type": "ui_gauge",
+        "z": "1453a8421bbc3bd8",
+        "g": "c5da05433b1d5355",
+        "name": "",
+        "group": "3214e0cfc3a3f0ea",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Calories",
+        "label": "cal",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "3000",
+        "colors": [
+            "#00ca00",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "1000",
+        "seg2": "2000",
+        "diff": false,
+        "className": "",
+        "x": 860,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "a70a859bc0e61af4",
+        "type": "ui_gauge",
+        "z": "1453a8421bbc3bd8",
+        "g": "c5da05433b1d5355",
+        "name": "",
+        "group": "3214e0cfc3a3f0ea",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Active Minutes",
+        "label": "mins",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "120",
+        "colors": [
+            "#00ca00",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "30",
+        "seg2": "60",
+        "diff": false,
+        "className": "",
+        "x": 860,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "2fa32eec34a13d55",
+        "type": "ui_gauge",
+        "z": "1453a8421bbc3bd8",
+        "g": "c5da05433b1d5355",
+        "name": "",
+        "group": "3214e0cfc3a3f0ea",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Heart Rate",
+        "label": "bpm",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "120",
+        "colors": [
+            "#00ca00",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "60",
+        "seg2": "100",
+        "diff": false,
+        "className": "",
+        "x": 860,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "e33aa2058112a7e7",
+        "type": "ui_gauge",
+        "z": "1453a8421bbc3bd8",
+        "g": "c5da05433b1d5355",
+        "name": "",
+        "group": "3214e0cfc3a3f0ea",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Distance",
+        "label": "km",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "10",
+        "colors": [
+            "#00ca00",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "3",
+        "seg2": "6",
+        "diff": false,
+        "className": "",
+        "x": 860,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "ec5ebc7a66165ae5",
+        "type": "ui_chart",
+        "z": "1453a8421bbc3bd8",
+        "g": "c5da05433b1d5355",
+        "name": "",
+        "group": "3214e0cfc3a3f0ea",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "label": "Fitness Trends",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "24",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 860,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "50737421757e7db4",
+        "type": "ui_chart",
+        "z": "1453a8421bbc3bd8",
+        "g": "c5da05433b1d5355",
+        "name": "",
+        "group": "3214e0cfc3a3f0ea",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "label": "Heart Rate History",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "0",
+        "ymax": "200",
+        "removeOlder": "24",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": true,
+        "useUTC": false,
+        "colors": [
+            "#ff0000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 870,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fec0687fb444df38",
+        "type": "ui_toast",
+        "z": "1453a8421bbc3bd8",
+        "g": "c5da05433b1d5355",
+        "position": "top right",
+        "displayTime": "5",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 490,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "71283ebd93a7181d",
+        "type": "mongodb out",
+        "z": "1453a8421bbc3bd8",
+        "g": "c5da05433b1d5355",
+        "mongodb": "b29d4e7647c2a351",
+        "name": "",
+        "collection": "heart_rate_data",
+        "payonly": false,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 550,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "3214e0cfc3a3f0ea",
+        "type": "ui_group",
+        "name": "Fitness Tracker",
+        "tab": "d28d5c0330c961fb",
+        "order": 1,
+        "disp": true,
+        "width": 6,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b29d4e7647c2a351",
+        "type": "mongodb",
+        "hostname": "127.0.0.1",
+        "topology": "direct",
+        "port": 27017,
+        "db": "test",
+        "name": ""
+    },
+    {
+        "id": "d28d5c0330c961fb",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
