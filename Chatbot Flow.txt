@@ -1,0 +1,231 @@
+[
+    {
+        "id": "8ebe9d9eeb9c52d9",
+        "type": "group",
+        "z": "7387f081669c7687",
+        "name": "Chatbot App",
+        "style": {
+            "fill": "#d1d1d1",
+            "label": true,
+            "label-position": "n",
+            "color": "#ff0000"
+        },
+        "nodes": [
+            "d7ee9313d8352d97",
+            "3881cccb23096192",
+            "77c8c08e1bff95e0",
+            "808a59fa5c5baea8",
+            "ec6661b825116273",
+            "bef59f59d44590de",
+            "15a4735d5f6d9ec8",
+            "f4099bc25c810635",
+            "6c89fd85fa3a7b07"
+        ],
+        "x": 154,
+        "y": 139,
+        "w": 752,
+        "h": 242
+    },
+    {
+        "id": "d7ee9313d8352d97",
+        "type": "ui_text_input",
+        "z": "7387f081669c7687",
+        "g": "8ebe9d9eeb9c52d9",
+        "name": "User Input",
+        "label": "Ask a question",
+        "tooltip": "",
+        "group": "cc6b917662d6a827",
+        "order": 1,
+        "width": 12,
+        "height": 1,
+        "passthru": true,
+        "mode": "text",
+        "delay": 300,
+        "topic": "user_message",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "str",
+        "x": 250,
+        "y": 200,
+        "wires": [
+            [
+                "3881cccb23096192"
+            ]
+        ]
+    },
+    {
+        "id": "3881cccb23096192",
+        "type": "function",
+        "z": "7387f081669c7687",
+        "g": "8ebe9d9eeb9c52d9",
+        "name": "Process User Question",
+        "func": "let userMessage = msg.payload.toLowerCase().trim();\nlet botResponse = \"I don't understand. Please ask another question.\";\n\nconst responses = {\n    \"hi\": \"Hi there?\",\n    \"hello\": \"Hi there! How can I help you?\",\n    \"who are you\" : \"i am demo chatbot created using nodered\",\n    \"how are you\": \"I'm just a bot, but I'm doing great! How about you?\",\n    \"what is node-red\": \"Node-RED is a flow-based development tool for visual programming.\",\n    \"who created node-red\": \"Node-RED was created by IBM’s Emerging Technology Services team.\",\n    \"goodbye\": \"Goodbye! Have a great day!\",\n    \"best nodered channel\" : \"Mr tech bangalore is best youtube channel to learn nodered\"\n};\n\nfor (let question in responses) {\n    if (userMessage.includes(question)) {\n        botResponse = responses[question];\n        break;\n    }\n}\n\nlet chatHistory = flow.get('chatHistory') || [];\nlet timestamp = new Date().toLocaleTimeString();\nchatHistory.push({ user: 'You', message: msg.payload, timestamp: timestamp });\nchatHistory.push({ user: 'Chatbot', message: botResponse, timestamp: timestamp });\nflow.set('chatHistory', chatHistory);\n\nreturn [\n    { topic: 'typing', payload: true },\n    { topic: 'chat_update', payload: chatHistory, delay: 1000 }\n];",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 200,
+        "wires": [
+            [
+                "808a59fa5c5baea8"
+            ],
+            [
+                "77c8c08e1bff95e0"
+            ]
+        ]
+    },
+    {
+        "id": "77c8c08e1bff95e0",
+        "type": "ui_template",
+        "z": "7387f081669c7687",
+        "g": "8ebe9d9eeb9c52d9",
+        "group": "cc6b917662d6a827",
+        "name": "Chat History",
+        "order": 2,
+        "width": 12,
+        "height": 6,
+        "format": "<div ng-repeat='msg in msg.payload track by $index' style='padding:5px;'>\n    <strong>{{msg.user}}:</strong> {{msg.message}}\n    <span style='font-size:small;color:gray;'>({{msg.timestamp}})</span>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 790,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "808a59fa5c5baea8",
+        "type": "ui_text",
+        "z": "7387f081669c7687",
+        "g": "8ebe9d9eeb9c52d9",
+        "group": "cc6b917662d6a827",
+        "order": 3,
+        "width": 12,
+        "height": 1,
+        "label": "",
+        "format": "{{msg.payload ? 'Chatbot is typing...' : ''}}",
+        "x": 770,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "ec6661b825116273",
+        "type": "ui_button",
+        "z": "7387f081669c7687",
+        "g": "8ebe9d9eeb9c52d9",
+        "name": "Save Chat",
+        "group": "cc6b917662d6a827",
+        "order": 4,
+        "width": 6,
+        "height": 1,
+        "label": "Save Chat",
+        "color": "green",
+        "bgcolor": "white",
+        "x": 250,
+        "y": 340,
+        "wires": [
+            [
+                "f4099bc25c810635"
+            ]
+        ]
+    },
+    {
+        "id": "bef59f59d44590de",
+        "type": "ui_button",
+        "z": "7387f081669c7687",
+        "g": "8ebe9d9eeb9c52d9",
+        "name": "Clear Chat",
+        "group": "cc6b917662d6a827",
+        "order": 5,
+        "width": 6,
+        "height": 1,
+        "label": "Clear Chat",
+        "color": "red",
+        "bgcolor": "white",
+        "x": 250,
+        "y": 260,
+        "wires": [
+            [
+                "15a4735d5f6d9ec8"
+            ]
+        ]
+    },
+    {
+        "id": "15a4735d5f6d9ec8",
+        "type": "function",
+        "z": "7387f081669c7687",
+        "g": "8ebe9d9eeb9c52d9",
+        "name": "Clear Chat History",
+        "func": "flow.set('chatHistory', []);\nreturn { topic: 'chat_update', payload: [] };",
+        "outputs": 1,
+        "x": 510,
+        "y": 260,
+        "wires": [
+            [
+                "77c8c08e1bff95e0"
+            ]
+        ]
+    },
+    {
+        "id": "f4099bc25c810635",
+        "type": "function",
+        "z": "7387f081669c7687",
+        "g": "8ebe9d9eeb9c52d9",
+        "name": "Prepare Chat for MongoDB",
+        "func": "let chatHistory = flow.get('chatHistory') || [];\nif (chatHistory.length === 0) return null;\n\nreturn {\n    topic: \"save_chat\",\n    payload: {\n        chat_session: new Date().toISOString(),\n        messages: chatHistory\n    }\n};",
+        "outputs": 1,
+        "x": 520,
+        "y": 340,
+        "wires": [
+            [
+                "6c89fd85fa3a7b07"
+            ]
+        ]
+    },
+    {
+        "id": "6c89fd85fa3a7b07",
+        "type": "mongodb out",
+        "z": "7387f081669c7687",
+        "g": "8ebe9d9eeb9c52d9",
+        "mongodb": "bf1328748b2f7f85",
+        "name": "Save to MongoDB",
+        "collection": "chatHistory",
+        "payonly": false,
+        "upsert": false,
+        "multi": false,
+        "operation": "insert",
+        "x": 790,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "cc6b917662d6a827",
+        "type": "ui_group",
+        "name": "Chatbot",
+        "tab": "ui_dashboard",
+        "order": 1,
+        "disp": true,
+        "width": "12"
+    },
+    {
+        "id": "bf1328748b2f7f85",
+        "type": "mongodb",
+        "hostname": "localhost",
+        "topology": "direct",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "chatbotDB",
+        "name": "MongoDB Connection"
+    },
+    {
+        "id": "ui_dashboard",
+        "type": "ui_tab",
+        "name": "Chat Room",
+        "icon": "dashboard"
+    }
+]
