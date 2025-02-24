@@ -1,0 +1,251 @@
+[
+    {
+        "id": "4a79bda313534002",
+        "type": "group",
+        "z": "4dd6dbb5667d355b",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "e8c0782fff07b082",
+            "50493001efd0fa34",
+            "dd57662cbfe6155f",
+            "6ca58b7d86150638",
+            "470d27cf91c999c9",
+            "957942aac1788200",
+            "161ea8358258c619",
+            "44e8df7a4eedc6cb",
+            "9487a3a9ecd9864a"
+        ],
+        "x": 294,
+        "y": 59,
+        "w": 592,
+        "h": 562
+    },
+    {
+        "id": "e8c0782fff07b082",
+        "type": "ui_form",
+        "z": "4dd6dbb5667d355b",
+        "g": "4a79bda313534002",
+        "name": "City Input",
+        "label": "Enter Your City",
+        "group": "dashboard_group",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "options": [
+            {
+                "label": "City Name",
+                "value": "city",
+                "type": "text",
+                "required": true,
+                "rows": null
+            }
+        ],
+        "formValue": {
+            "city": ""
+        },
+        "payload": "",
+        "submit": "Get Times",
+        "cancel": "",
+        "topic": "",
+        "topicType": "str",
+        "splitLayout": false,
+        "className": "",
+        "x": 460,
+        "y": 180,
+        "wires": [
+            [
+                "50493001efd0fa34"
+            ]
+        ]
+    },
+    {
+        "id": "50493001efd0fa34",
+        "type": "http request",
+        "z": "4dd6dbb5667d355b",
+        "g": "4a79bda313534002",
+        "name": "Geocode City",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://geocoding-api.open-meteo.com/v1/search?name={{payload.city}}&count=1",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 440,
+        "y": 300,
+        "wires": [
+            [
+                "dd57662cbfe6155f"
+            ]
+        ]
+    },
+    {
+        "id": "dd57662cbfe6155f",
+        "type": "function",
+        "z": "4dd6dbb5667d355b",
+        "g": "4a79bda313534002",
+        "name": "Extract Coordinates",
+        "func": "if (msg.payload.results && msg.payload.results.length > 0) {\n    let result = msg.payload.results[0];\n    msg.payload = {\n        latitude: result.latitude,\n        longitude: result.longitude,\n        city: result.name,\n        timezone: result.timezone // Include timezone if available\n    };\n} else {\n    msg.payload = { error: \"City not found! Please try again.\" };\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 410,
+        "y": 380,
+        "wires": [
+            [
+                "6ca58b7d86150638"
+            ]
+        ]
+    },
+    {
+        "id": "6ca58b7d86150638",
+        "type": "switch",
+        "z": "4dd6dbb5667d355b",
+        "g": "4a79bda313534002",
+        "name": "Check for Error",
+        "property": "payload.error",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            },
+            {
+                "t": "null"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 440,
+        "y": 540,
+        "wires": [
+            [
+                "161ea8358258c619"
+            ],
+            [
+                "470d27cf91c999c9"
+            ]
+        ]
+    },
+    {
+        "id": "470d27cf91c999c9",
+        "type": "http request",
+        "z": "4dd6dbb5667d355b",
+        "g": "4a79bda313534002",
+        "name": "Fetch Sunrise/Sunset",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.sunrise-sunset.org/json?lat={{payload.latitude}}&lng={{payload.longitude}}&formatted=0",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 760,
+        "y": 480,
+        "wires": [
+            [
+                "957942aac1788200",
+                "44e8df7a4eedc6cb"
+            ]
+        ]
+    },
+    {
+        "id": "957942aac1788200",
+        "type": "function",
+        "z": "4dd6dbb5667d355b",
+        "g": "4a79bda313534002",
+        "name": "Process Times",
+        "func": "let sunrise = new Date(msg.payload.results.sunrise);\nlet sunset = new Date(msg.payload.results.sunset);\nlet now = new Date();\n\nmsg.sunrise = sunrise.toLocaleTimeString();\nmsg.sunset = sunset.toLocaleTimeString();\n\nlet dayLength = sunset - sunrise;\nlet timeSinceSunrise = now - sunrise;\nlet position = (timeSinceSunrise / dayLength) * 100;\nmsg.position = Math.max(0, Math.min(100, position));\n\nmsg.payload = {\n    sunrise: msg.sunrise,\n    sunset: msg.sunset,\n    position: msg.position,\n    city: msg.payload.city,\n    timezone: msg.payload.timezone // Pass timezone to UI\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 760,
+        "y": 340,
+        "wires": [
+            [
+                "161ea8358258c619"
+            ]
+        ]
+    },
+    {
+        "id": "161ea8358258c619",
+        "type": "ui_template",
+        "z": "4dd6dbb5667d355b",
+        "g": "4a79bda313534002",
+        "group": "dashboard_group",
+        "name": "Sun Animation UI",
+        "order": 2,
+        "width": "6",
+        "height": "6",
+        "format": "<style>\n  .sun-container {\n    position: relative;\n    width: 100%;\n    height: 200px;\n    background: linear-gradient(to bottom, #87CEEB, #FFD700);\n    border-radius: 10px;\n    overflow: hidden;\n  }\n  .sun {\n    position: absolute;\n    width: 50px;\n    height: 50px;\n    background: url('https://img.icons8.com/color/48/000000/sun.png');\n    background-size: cover;\n    transition: all 5s ease-in-out;\n  }\n  .sun:hover::after {\n    content: 'Current position: ' attr(data-time);\n    position: absolute;\n    top: -30px;\n    left: 50%;\n    transform: translateX(-50%);\n    background: rgba(0, 0, 0, 0.8);\n    color: white;\n    padding: 5px;\n    border-radius: 3px;\n    font-size: 12px;\n    white-space: nowrap;\n  }\n  .times {\n    text-align: center;\n    font-family: Arial, sans-serif;\n    margin-top: 10px;\n  }\n  .error {\n    color: red;\n    text-align: center;\n    font-family: Arial, sans-serif;\n  }\n</style>\n\n<div ng-if=\"msg.payload.error\" class=\"error\">\n  {{msg.payload.error}}\n</div>\n<div ng-if=\"!msg.payload.error\">\n  <h3>{{msg.payload.city}}</h3>\n  <div class=\"sun-container\">\n    <div class=\"sun\" ng-style=\"{'left': msg.payload.position + '%', 'bottom': (msg.payload.position < 50 ? msg.payload.position * 2 : (100 - msg.payload.position) * 2) + '%'}\" id=\"sun-element\"></div>\n  </div>\n  <div class=\"times\">\n    <p><strong>Sunrise:</strong> {{msg.sunrise}}</p>\n    <p><strong>Sunset:</strong> {{msg.sunset}}</p>\n  </div>\n</div>\n\n<script>\n  (function(scope) {\n    const sun = document.getElementById('sun-element');\n    if (sun && scope.msg.payload.timezone) {\n      const updateTime = () => {\n        const now = new Date().toLocaleTimeString('en-US', { timeZone: scope.msg.payload.timezone });\n        sun.setAttribute('data-time', now);\n      };\n      updateTime();\n      setInterval(updateTime, 1000); // Update every second\n    }\n    setInterval(() => {\n      scope.$evalAsync();\n    }, 60000);\n  })(this.scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 770,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "44e8df7a4eedc6cb",
+        "type": "debug",
+        "z": "4dd6dbb5667d355b",
+        "g": "4a79bda313534002",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "9487a3a9ecd9864a",
+        "type": "comment",
+        "z": "4dd6dbb5667d355b",
+        "g": "4a79bda313534002",
+        "name": "SunRise and SunSet ",
+        "info": "",
+        "x": 690,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "dashboard_group",
+        "type": "ui_group",
+        "name": "Sunrise/Sunset",
+        "tab": "dashboard_tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "dashboard_tab",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
