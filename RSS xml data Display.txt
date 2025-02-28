@@ -1,0 +1,222 @@
+[
+    {
+        "id": "d7340e3812f0ef68",
+        "type": "group",
+        "z": "9c6ba47f0f310e78",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "631a7675f5e998ef",
+            "1c6c9c80ad55a9f5",
+            "e0b73def57858104",
+            "5be474ba165db7e5",
+            "e22cb2817dc8ddf2",
+            "0c32495d59a11e6b",
+            "0d9552a57cda01aa",
+            "f602e8ddb1b10296",
+            "5ff129944a4440f7"
+        ],
+        "x": 314,
+        "y": 239,
+        "w": 892,
+        "h": 282
+    },
+    {
+        "id": "631a7675f5e998ef",
+        "type": "http request",
+        "z": "9c6ba47f0f310e78",
+        "g": "d7340e3812f0ef68",
+        "name": "Fetch YouTube XML",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCL4-_86jqOf1C4IQz9oAFLA",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 440,
+        "y": 480,
+        "wires": [
+            [
+                "1c6c9c80ad55a9f5",
+                "5ff129944a4440f7"
+            ]
+        ]
+    },
+    {
+        "id": "1c6c9c80ad55a9f5",
+        "type": "xml",
+        "z": "9c6ba47f0f310e78",
+        "g": "d7340e3812f0ef68",
+        "name": "Parse XML",
+        "property": "payload",
+        "attr": "",
+        "chr": "",
+        "x": 640,
+        "y": 480,
+        "wires": [
+            [
+                "e0b73def57858104",
+                "f602e8ddb1b10296"
+            ]
+        ]
+    },
+    {
+        "id": "e0b73def57858104",
+        "type": "function",
+        "z": "9c6ba47f0f310e78",
+        "g": "d7340e3812f0ef68",
+        "name": "Extract Video Details",
+        "func": "let feed = msg.payload.feed;\nif (!feed || !feed.entry) {\n    msg.payload = [];\n    return msg;\n}\nlet entries = Array.isArray(feed.entry) ? feed.entry : [feed.entry];\n\nlet videos = entries.map(entry => {\n    let statistics = entry[\"media:group\"]?.[0]?.[\"media:community\"]?.[0]?.[\"media:statistics\"]?.[0]?.$ || {}; \n    let views = statistics.views || \"0\";\n    return {\n        title: entry.title?.[0] || \"No Title\",\n        url: entry.link?.[0]?.$?.href || \"#\",\n        thumbnail: entry[\"media:group\"]?.[0]?.[\"media:thumbnail\"]?.[0]?.$?.url || \"https://via.placeholder.com/150\",\n        //views: entry[\"media:community\"]?.[0]?.[\"media:statistics\"]?.[0]?.$?.views || \"0\",\n       views : views,\n        rating: entry[\"media:group\"]?.[0]?.[\"media:community\"]?.[0]?.[\"media:starRating\"]?.[0]?.$?.average || \"N/A\",\n        published: entry.published?.[0] ? new Date(entry.published[0]).toDateString() : \"Unknown Date\",\n        description: entry[\"media:group\"]?.[0]?.[\"media:description\"] || \"\"\n    };\n});\nmsg.payload = videos;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 480,
+        "wires": [
+            [
+                "5be474ba165db7e5",
+                "0c32495d59a11e6b"
+            ]
+        ]
+    },
+    {
+        "id": "5be474ba165db7e5",
+        "type": "ui_template",
+        "z": "9c6ba47f0f310e78",
+        "g": "d7340e3812f0ef68",
+        "group": "6b800beeb703abcb",
+        "name": "Display Videos",
+        "order": 1,
+        "width": "20",
+        "height": "17",
+        "format": "<div class=\"youtube-container\">\n    <header class=\"yt-header\">\n        <h1>Mr Tech Bangalore</h1>\n        <div class=\"channel-info\">Latest Videos</div>\n    </header>\n    <div id=\"video-list\" class=\"video-grid\"></div>\n</div>\n\n<style>\n    .youtube-container {\n        max-width: 1400px;\n        margin: 0 auto;\n        padding: 20px;\n        background: #ffffff;\n        font-family: 'Roboto', Arial, sans-serif;\n    }\n\n    .yt-header {\n        text-align: center;\n        padding: 20px 0;\n        border-bottom: 1px solid #eee;\n        margin-bottom: 30px;\n    }\n\n    .yt-header h1 {\n        margin: 0;\n        color: #030303;\n        font-size: 24px;\n        font-weight: 600;\n    }\n\n    .channel-info {\n        color: #606060;\n        font-size: 14px;\n    }\n\n    .video-grid {\n        display: grid;\n        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));\n        gap: 24px;\n        padding: 0 16px;\n    }\n\n    .video-card {\n        background: #fff;\n        border-radius: 8px;\n        overflow: hidden;\n        transition: transform 0.2s;\n    }\n\n    .video-card:hover {\n        transform: translateY(-2px);\n    }\n\n    .video-thumbnail {\n        position: relative;\n        padding-top: 56.25%;\n        background: #000;\n        border-radius: 8px;\n        overflow: hidden;\n    }\n\n    .video-thumbnail img {\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n        object-fit: cover;\n    }\n\n    .video-info {\n        padding: 12px 0;\n    }\n\n    .video-title {\n        color: #030303;\n        font-size: 16px;\n        font-weight: 500;\n        line-height: 1.4;\n        margin-bottom: 8px;\n        display: -webkit-box;\n        -webkit-line-clamp: 2;\n        -webkit-box-orient: vertical;\n        overflow: hidden;\n    }\n\n    /* .video-meta {\n        color: #606060;\n        font-size: 13px;\n        margin-bottom: 8px;\n        line-height: 1.4;\n    } */\n\n.video-meta {\ncolor: #606060;\nfont-size: 13px;\nmargin-bottom: 12px;\nline-height: 1.4;\ndisplay: -webkit-box;\n-webkit-line-clamp: 10 ; /* Limit to 4 lines */\n-webkit-box-orient: vertical;\noverflow: hidden;\n}\n    .watch-btn {\n        display: inline-block;\n        background: #ff0000;\n        color: white;\n        padding: 8px 16px;\n        border-radius: 18px;\n        text-decoration: none;\n        font-size: 14px;\n        font-weight: 500;\n        transition: background 0.2s;\n    }\n\n    .watch-btn:hover {\n        background: #cc0000;\n    }\n\n    @media (max-width: 768px) {\n        .video-grid {\n            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));\n        }\n    }\n</style>\n\n<script>\n    (function(scope) {\n        scope.$watch('msg.payload', function(videos) {\n            const videoList = document.getElementById(\"video-list\");\n            videoList.innerHTML = \"\";\n            \n            videos.forEach(video => {\n                const videoCard = document.createElement(\"div\");\n                videoCard.className = \"video-card\";\n\n                videoCard.innerHTML = `\n                    <div class=\"video-thumbnail\">\n                        <img src=\"${video.thumbnail}\" alt=\"${video.title}\">\n                    </div>\n                    <div class=\"video-info\">\n                        <div class=\"video-title\">${video.title}</div>\n                        <div class=\"video-meta\">\n                            <span>${video.views} views</span><br>\n                            <span>Published: ${video.published}</span><br>\n                              <span>rating: ${video.rating}</span><br>\n                            <span>description: ${video.description}</span>\n                        </div>\n                        <a href=\"${video.url}\" target=\"_blank\" class=\"watch-btn\">Watch Now</a>\n                    </div>\n                `;\n                videoList.appendChild(videoCard);\n            });\n        });\n    })(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 1100,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e22cb2817dc8ddf2",
+        "type": "inject",
+        "z": "9c6ba47f0f310e78",
+        "g": "d7340e3812f0ef68",
+        "name": "Trigger Fetch",
+        "props": [],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.1",
+        "topic": "",
+        "payloadType": "date",
+        "x": 460,
+        "y": 340,
+        "wires": [
+            [
+                "631a7675f5e998ef"
+            ]
+        ]
+    },
+    {
+        "id": "0c32495d59a11e6b",
+        "type": "debug",
+        "z": "9c6ba47f0f310e78",
+        "g": "d7340e3812f0ef68",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "0d9552a57cda01aa",
+        "type": "comment",
+        "z": "9c6ba47f0f310e78",
+        "g": "d7340e3812f0ef68",
+        "name": "ransforming YouTube RSS Feed into a Dynamic Node-RED Dashboard",
+        "info": "https://www.youtube.com/channel/UCL4-_86jqOf1C4IQz9oAFLA\n\nUCKKhdFV0q8CV5vWUDfiDfTw",
+        "x": 740,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "f602e8ddb1b10296",
+        "type": "debug",
+        "z": "9c6ba47f0f310e78",
+        "g": "d7340e3812f0ef68",
+        "name": "debug 8",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "5ff129944a4440f7",
+        "type": "debug",
+        "z": "9c6ba47f0f310e78",
+        "g": "d7340e3812f0ef68",
+        "name": "debug 10",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 660,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "6b800beeb703abcb",
+        "type": "ui_group",
+        "name": "Table",
+        "tab": "9326f74d2ff7fe25",
+        "order": 1,
+        "disp": true,
+        "width": 20,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9326f74d2ff7fe25",
+        "type": "ui_tab",
+        "name": "Dashboard",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
