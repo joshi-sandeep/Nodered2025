@@ -1,0 +1,224 @@
+[
+    {
+        "id": "ac6818338eb80585",
+        "type": "group",
+        "z": "e209cc0d06582f49",
+        "name": "Chaging File Fromat ",
+        "style": {
+            "fill": "#e3f3d3",
+            "label": true
+        },
+        "nodes": [
+            "b1febd3fab24a25a",
+            "a187cde19b2a6884",
+            "34297cdba7db8bfc",
+            "17743cbeb2f85f6c",
+            "58191d8ed19cb5a8",
+            "b8bad35203bf1be6",
+            "15093aea7f36a95d",
+            "7b67268b8d056df3"
+        ],
+        "x": 74,
+        "y": 119,
+        "w": 882,
+        "h": 302
+    },
+    {
+        "id": "b1febd3fab24a25a",
+        "type": "join",
+        "z": "e209cc0d06582f49",
+        "g": "ac6818338eb80585",
+        "name": "",
+        "mode": "custom",
+        "build": "buffer",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "",
+        "joinerType": "str",
+        "useparts": true,
+        "accumulate": false,
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 370,
+        "y": 160,
+        "wires": [
+            [
+                "a187cde19b2a6884"
+            ]
+        ]
+    },
+    {
+        "id": "a187cde19b2a6884",
+        "type": "function",
+        "z": "e209cc0d06582f49",
+        "g": "ac6818338eb80585",
+        "name": "toBase64",
+        "func": "msg.payload = msg.payload.toString(\"base64\")\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 160,
+        "wires": [
+            [
+                "34297cdba7db8bfc"
+            ]
+        ]
+    },
+    {
+        "id": "34297cdba7db8bfc",
+        "type": "file",
+        "z": "e209cc0d06582f49",
+        "g": "ac6818338eb80585",
+        "name": "",
+        "filename": "D:/Nodered Git/test.txt",
+        "filenameType": "str",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 830,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "17743cbeb2f85f6c",
+        "type": "file in",
+        "z": "e209cc0d06582f49",
+        "g": "ac6818338eb80585",
+        "name": "",
+        "filename": "D:/Nodered Git/test.txt",
+        "filenameType": "str",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 430,
+        "y": 280,
+        "wires": [
+            [
+                "b8bad35203bf1be6"
+            ]
+        ]
+    },
+    {
+        "id": "58191d8ed19cb5a8",
+        "type": "inject",
+        "z": "e209cc0d06582f49",
+        "g": "ac6818338eb80585",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 280,
+        "wires": [
+            [
+                "17743cbeb2f85f6c"
+            ]
+        ]
+    },
+    {
+        "id": "b8bad35203bf1be6",
+        "type": "function",
+        "z": "e209cc0d06582f49",
+        "g": "ac6818338eb80585",
+        "name": "toBuffer",
+        "func": "msg.payload = Buffer.from(msg.payload, \"base64\")\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 260,
+        "wires": [
+            [
+                "15093aea7f36a95d"
+            ]
+        ]
+    },
+    {
+        "id": "15093aea7f36a95d",
+        "type": "file",
+        "z": "e209cc0d06582f49",
+        "g": "ac6818338eb80585",
+        "name": "",
+        "filename": "D:/Nodered Git/test.jpg",
+        "filenameType": "str",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 720,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7b67268b8d056df3",
+        "type": "ui_upload",
+        "z": "e209cc0d06582f49",
+        "g": "ac6818338eb80585",
+        "group": "f550f4fc8cbb223a",
+        "title": "upload",
+        "accept": "",
+        "name": "",
+        "order": 1,
+        "width": "6",
+        "height": "8",
+        "chunk": 256,
+        "transfer": "binary",
+        "x": 190,
+        "y": 160,
+        "wires": [
+            [
+                "b1febd3fab24a25a"
+            ]
+        ]
+    },
+    {
+        "id": "f550f4fc8cbb223a",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "11130b2099b2c68d",
+        "order": 1,
+        "disp": true,
+        "width": "26",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "11130b2099b2c68d",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
